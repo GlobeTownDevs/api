@@ -37,6 +37,7 @@ function getSources(){
 
 // 1st make sources request, store results in array with sources
 
+
 /* getHeadlines
 retrieves first 10 headlines for a selected source
 */

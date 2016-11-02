@@ -1,8 +1,6 @@
 QUnit.test("that we can add topics to the database object", function(assert){
   var done = assert.async();
-  var headline = {
-    title: "Irish PM warns Brexit talks between UK and EU could turn vicious Enda Kenny urges his fellow EU leaders not to become ‘obsessed’ over what Britain may or may not get in Brexit negotiations"
-  }
+  var headline = Object.assign({}, headlines[0]); /* This creates a copy of headlines[0] */
   requestConstructor(headline);
   setTimeout(function(){
     assert.ok(headline.topics, 'Passed!');
@@ -12,13 +10,9 @@ QUnit.test("that we can add topics to the database object", function(assert){
 
 QUnit.test("that we can add topics to the topicsCount object", function(assert){
   var done = assert.async();
-  var headline = {
-    title: "Irish PM warns Brexit talks between UK and EU could turn vicious Enda Kenny urges his fellow EU leaders not to become ‘obsessed’ over what Britain may or may not get in Brexit negotiations"
-  }
-  processHeadlines([headline]);
+  processHeadlines(headlines);
   setTimeout(function(){
     assert.ok(topicsCount.Politics, 'Passed!');
-    console.log(topicsCount);
     done();
   },10);
 });

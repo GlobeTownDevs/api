@@ -1,6 +1,6 @@
 // Mock Array of Headlines
 
-var headlinesArray = [
+var headlines = [
     {
       "title": "Facebook blocks insurer discount plan",
       "description": "Facebook blocks an insurer's plan to view young drivers' profiles to set car insurance premiums.",
@@ -71,4 +71,4 @@ var headlinesArray = [
       "urlToImage": "http://ichef.bbci.co.uk/news/1024/cpsprodpb/214A/production/_92222580_mediaitem92222579.jpg",
       "publishedAt": "2016-11-02T10:11:32Z"
     }
-]
+];
