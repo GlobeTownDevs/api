@@ -27,13 +27,40 @@ function getSources(){
                     database[source.name]['logo'] = source.urlsToLogos.small;
                 });
                 console.log(database);
+                // this will be removed when we implement a callback/waterfall/eventListener
+                getHeadlines(database["BBC News"]);
         });
         xhr.open('GET', url, true);
         xhr.send();
+
 }
 
 // 1st make sources request, store results in array with sources
 
+/* getHeadlines
+retrieves first 10 headlines for a selected source
+*/
+
+getSources();
+
+
+function getHeadlines(selectedSource) {
+  var url = "https://newsapi.org/v1/articles?";
+      url += "source=" + selectedSource.id + "&apikey=" + newsApiKey;
+
+  var xhr = new XMLHttpRequest();
+      xhr.addEventListener("load", function(){
+        var json = JSON.parse(xhr.responseText);
+        database[selectedSource.name]["headlines"] = [];
+        json.articles.forEach(function(article) {
+          delete article["author"];
+          database[selectedSource.name]["headlines"].push(article);
+        });
+        console.log(database);
+      });
+      xhr.open('GET', url, true);
+      xhr.send();
+}
 
 
 
