@@ -71,4 +71,4 @@ var headlines = [
       "urlToImage": "http://ichef.bbci.co.uk/news/1024/cpsprodpb/214A/production/_92222580_mediaitem92222579.jpg",
       "publishedAt": "2016-11-02T10:11:32Z"
     }
-]
+];

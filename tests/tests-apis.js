@@ -13,7 +13,6 @@ QUnit.test("that we can add topics to the topicsCount object", function(assert){
   processHeadlines(headlines);
   setTimeout(function(){
     assert.ok(topicsCount.Politics, 'Passed!');
-    console.log(topicsCount);
     done();
   },10);
 });
