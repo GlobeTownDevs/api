@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Mock Array of Headlines
 
 var headlinesArray = [
@@ -73,7 +72,7 @@ var headlinesArray = [
       "publishedAt": "2016-11-02T10:11:32Z"
     }
 ]
-=======
+
 window.XMLHttpRequest = (function (realXHR) {
   var _realXHR = realXHR || {};
 
@@ -122,4 +121,3 @@ window.XMLHttpRequest = (function (realXHR) {
 
   return MockXHR;
 })(window.XMLHttpRequest);
->>>>>>> c0264ce1d7ad4d3f9ea55ad68061b665e3aa4d94
