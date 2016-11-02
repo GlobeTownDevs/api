@@ -10,6 +10,9 @@ window.XMLHttpRequest = (function (realXHR) {
     this.responseText = null;
     this.listeners = {};
   }
+  MockXHR.prototype.setRequestHeader = function() {
+
+  }
 
   MockXHR.prototype.__restore = function () {
     window.XMLHttpRequest = _realXHR;
@@ -36,7 +39,7 @@ window.XMLHttpRequest = (function (realXHR) {
       self.response = self.response || self.__defaultResponse;
       self.responseText = JSON.stringify(self.response);
       self.onreadystatechange();
-      self.listeners.load.forEach(function (f) {f.bind(self)();})
+      //self.listeners.load.forEach(function (f) {f.bind(self)();})
     }, 0);
   };
   MockXHR.prototype.addEventListener = function (eventName, fn) {
