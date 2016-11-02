@@ -3,22 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>News API app</title>
+  <title>TESTING - News API app</title>
+  <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.0.1.css">
 </head>
 <body>
-
   <!-- include elements below for QUnit testing -->
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
-  <!-- comment out mock XHR when testing real API requests -->
-
-  <script type="text/javascript" src="tests/mockXHR_headlines.js"></script>
+<!-- comment out mock XHR when testing real API requests -->
   <script type="text/javascript" src="tests/mockXHR.js"></script>
-
-
   <script src="https://code.jquery.com/qunit/qunit-2.0.1.js"></script>
-
   <script type="text/javascript" src="api-keys.js"></script>
   <script type="text/javascript" src="index.js"></script>
+  <script type="text/javascript" src="tests/mockXHR.js"></script>
+  <script type="text/javascript" src="tests/mockAnalysis.js"></script>
+  <script type="text/javascript" src="tests/tests-apis.js"></script>
+  <!-- end of tests -->
 </body>
 </html>
