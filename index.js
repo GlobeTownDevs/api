@@ -4,6 +4,8 @@ var newsApiKey = apiKeys.newsApiKey;
 
 // News API requests
 
+// 1st make sources request, store results in array with sources
+
 // Text Razor requests
 function requestConstructor(headline) {
   var http = new XMLHttpRequest();
