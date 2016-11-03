@@ -1,4 +1,4 @@
-// Mock Array of Headlines
+//Mock Array of Headlines
 
 var headlines = [
     {

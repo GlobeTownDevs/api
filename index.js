@@ -1,128 +1,202 @@
-// Initialise api keys
-var textRazorKey = apiKeys.textRazorKey;
-var newsApiKey = apiKeys.newsApiKey;
+/* When testing in development, run the following command in console first before opening chrome;
+(mac) - open -a Google\ Chrome --args --disable-web-security --user-data-dir
+(windows) google-chrome --disable-web-security --user-data-dir
+*/
 
-// DOM Elements
-var sourceDropDown = document.getElementById("source-dropdown"),
-    analyzeBtn = document.getElementById("analyze"),
-    sourceLogo = document.getElementById("source-logo"),
-    headLines = document.getElementById("headlines"),
-    infoGraphicContainer = document.getElementById("infographic-container"),
-    pageTitle = document.getElementById("page-title");
+var visualiser = (function() {
 
-// Global Database
-var database = {};
+  // DOM Elements
+  var sourceDropDown = document.getElementById("source-dropdown"),
+      analyzeBtn = document.getElementById("analyze"),
+      sourceLogo = document.getElementById("source-logo"),
+      headLines = document.getElementById("headlines"),
+      infoGraphicContainer = document.getElementById("infographic-container"),
+      pageTitle = document.getElementById("page-title");
 
-// Waterfall function (no error handling)
-function waterfall(start, tasks) {
-  var next = tasks[0];
-  var tail = tasks.slice(1);
-  if (typeof next !== 'undefined') {
-    next(start, function(result) {
-      waterfall(result, tail)
-    })
-    return ;
+  // Global variables
+  var database = this.database = {};
+  var topicsCount = this.topicsCount = {};
+
+  // Waterfall function. arg= initial argument. tasks= array of async functions. cb= final function
+  function waterfall(arg, tasks, cb) {
+    var next = tasks[0];
+    var tail = tasks.slice(1);
+    if (typeof next !== 'undefined') {
+      next(arg, function(err, result) {
+        if(err) { return cb(err); }
+        waterfall(result, tail, cb);
+      });
+      return;
+    }
+    cb(null, arg);
   }
-}
+
+  // Make values of each topic be between 0 and 1.0
+  function normalise(topics, cb) {
+    var maxValue = 0;
+    for(var topic in topics) {
+      if(topics[topic] > maxValue) {
+        maxValue = topics[topic];
+      }
+    }
+    for(var topic in topics) {
+      topics[topic] = topics[topic] / maxValue;
+    }
+    cb(null, topics);
+  }
+
+  //// Event Handlers /////
+
+  // Window load
+  window.addEventListener("load", function(){
+      waterfall(database,
+        [
+          getSources,
+            buildOptions
+              ],
+                function(err, result) {/* console.log(result) */});
+  });
+
+  // Dropdown
+  sourceDropDown.addEventListener("change", function(){
+      waterfall(sourceDropDown.value,
+        [
+          emptyTopicsObject,
+            deactivateAnalyzeBtn,
+              updateLogo,
+                getHeadlines,
+                  updateArticles,
+                    addToggleToHeadlines,
+                      activateAnalyzeBtn
+                        ],
+                          function(err, result) {/* console.log(result) */});
+  });
+
+  // Analyze
+  analyzeBtn.addEventListener("click", function(){
+    if (!Object.keys(topicsCount).length) {
+      waterfall(sourceDropDown.value,
+        [
+          deactivateAnalyzeBtn,
+            emptyTopicsObject,
+              getHeadlines,
+                processHeadlines,
+                  normalise,
+                    fillTopicsObject,
+                      buildInfoGraph,
+                        toggleInfographic,
+                          activateAnalyzeBtn
+                            ],
+        function(err, result) {/* console.log(result) */});
+
+    } else {
+      toggleInfographic(topicsCount,
+        function(err, result) {/* console.log(result) */});
+    }
+  });
 
 
-//// Event Handlers /////
+  //// Async functions ////
 
-// Window load
-window.addEventListener("load", function(){
-    waterfall(database, [getSources, buildOptions]);
-})
+  // updateLogo. receives: source name. responds: source name.
+  function updateLogo(selectedSource, cb){
+    var logoUrl = database[selectedSource]["logo"];
+    sourceLogo.src = logoUrl;
+    cb(null, selectedSource);
+  }
 
-// Dropdown
-sourceDropDown.addEventListener("change", function(){
-    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles, addToggleToHeadlines]);
-    analyzeBtn.disabled = false;
-});
-
-// Analyze
-analyzeBtn.addEventListener("click", function(){
-  buildInfoGraph();
-  toggleInfographic();
-});
-
-
-
-
-// function to build options for sourceDropDown select elements
-function buildOptions(database){
+  // buildOptions. receives: database, responds: database;
+  function buildOptions(database, cb){
     for (var source in database){
-        var option = document.createElement("option");
-            option.textContent = source;
-            option.value = source;
-        sourceDropDown.appendChild(option);
-    };
-};
+      var option = document.createElement("option");
+      option.textContent = source;
+      option.value = source;
+      sourceDropDown.appendChild(option);
+    }
+    cb(null, database);
+  }
+
+  // activate/deactive button functions. receives: (any input). responds (same as input)
+  function activateAnalyzeBtn(arg, cb){
+    analyzeBtn.disabled = false;
+    cb(null, arg);
+  }
+
+  function deactivateAnalyzeBtn(arg, cb){
+    analyzeBtn.disabled = true;
+    cb(null, arg);
+  }
 
 
-
-// Add onClick functionality when headlines loaded
-function addToggleToHeadlines() {
-  var headlines = document.querySelectorAll('.headline');
-  for(var i = 0; i < headlines.length; i++) {
-    headlines[i].addEventListener('click', function() {
-      var description = this.querySelector('p');
-      description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
-    });
+  // emptyTopicsObject. receives: source name, responds: source name.
+  function emptyTopicsObject(selectedSource, cb){
+    topicsCount = {};
+    cb(null, selectedSource);
+  }
+  // emptyTopicsObject. receives: topics object, responds: topics object
+  function fillTopicsObject(topics, cb){
+    topicsCount = topics;
+    cb(null, topics);
   };
-}
 
+  // Add onClick functionality when headlines loaded
+  function addToggleToHeadlines(arg, cb) {
+    var headlines = document.querySelectorAll('.headline');
+    for(var i = 0; i < headlines.length; i++) {
+      headlines[i].addEventListener('click', function() {
+        var description = this.querySelector('p');
+        description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+      });
+    };
+    cb(null, arg);
+  }
 
+  // getSources. receives: database. responds: database
+  function getSources(database, cb){
 
-// 1. getSources called on window load
-function getSources(database, cb){
-
-    var url = "https://newsapi.org/v1/sources?language=en&country=gb";
-        url += "&apikey=" + newsApiKey;
-
+    var url = "https://newsapi.org/v1/sources?language=en&country=gb" + "&apikey=" + apiKeys.newsApiKey;
     var xhr = new XMLHttpRequest();
-        xhr.addEventListener("load", function(){
-
-            var json = JSON.parse(xhr.responseText);
-                json.sources.forEach(function(source){
-                    database[source.name] = {};
-                    database[source.name]['name'] = source.name;
-                    database[source.name]['id']   = source.id;
-                    database[source.name]['logo'] = source.urlsToLogos.small;
-                });
-                // 2
-                cb(database);
+    xhr.addEventListener("load", function(){
+      var json = JSON.parse(xhr.responseText);
+        json.sources.forEach(function(source){
+          database[source.name] = {
+            name: source.name,
+            id: source.id,
+            logo: source.urlsToLogos.small
+          };
         });
-        xhr.open('GET', url, true);
-        xhr.send();
-}
+        // 2
+        cb(null, database);
+    });
+    xhr.open('GET', url, true);
+    xhr.send();
+  }
 
-
-
-// 2. getHeadlines, accepts db object name and retrieves headlines
-
-function getHeadlines(selectedSource, cb) {
-
+// getHeadlines. receives: source name, responds: source object from database
+  function getHeadlines(selectedSource, cb) {
+    //assigns appropriate db object
     selectedSource = database[selectedSource];
 
-  var url = "https://newsapi.org/v1/articles?";
-      url += "source=" + selectedSource.id + "&apikey=" + newsApiKey;
-
-  var xhr = new XMLHttpRequest();
-      xhr.addEventListener("load", function(){
-        // This will store all headlines to db
-        var json = JSON.parse(xhr.responseText);
-        database[selectedSource.name]["headlines"] = [];
-        json.articles.forEach(function(article) {
-          delete article["author"];
-          database[selectedSource.name]["headlines"].push(article);
-        });
-        cb(selectedSource);
+    var url = "https://newsapi.org/v1/articles?" + "source=" + selectedSource.id + "&apikey=" + apiKeys.newsApiKey;
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", function(){
+      var json = JSON.parse(xhr.responseText);
+      //assigns source object an array to append headline objects
+      database[selectedSource.name]["headlines"] = [];
+      json.articles.forEach(function(article) {
+        delete article["author"];
+        database[selectedSource.name]["headlines"].push(article);
       });
-      xhr.open('GET', url, true);
-      xhr.send();
+      cb(null, selectedSource);
+    });
+
+    xhr.open('GET', url, true);
+    xhr.send();
 }
 
+// updateArticles. receives: source object from db. responds: source object from db
 function updateArticles(selectedSource, cb) {
+  //remove previous headlines
   headLines.innerHTML = "";
   selectedSource["headlines"].forEach(function(headline) {
     // creating new elements
@@ -145,120 +219,103 @@ function updateArticles(selectedSource, cb) {
     // Append to headlines
     headLines.appendChild(article);
   });
-  cb(selectedSource);
+  cb(null, selectedSource);
 }
 
-function updateLogo(selectedSource, cb){
 
-  var logoUrl = database[selectedSource]["logo"];
-      sourceLogo.src = logoUrl;
+  // processHeadLines. receives: select source object from db. responds: topics object
+  function processHeadlines(selectedSource, cb){
 
-  cb(selectedSource);
-}
-
-// Text Razor requests
-function requestConstructor(headline) {
-  var http = new XMLHttpRequest();
-      http.withCredentials = true;
-  var url = "https://api.textrazor.com/";
-  var params = "text=" + headline.title + "&extractors=topics";
-      params = encodeURI(params);
-  console.log(params)
-
-  http.open("POST", url, true);
-
-  http.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-  http.setRequestHeader("X-TextRazor-Key", textRazorKey);
-  http.send(params);
-  // http.setRequestHeader("cache-control", "no-cache");
-
-  http.onreadystatechange = function() {
-    if(http.readyState == 4 && http.status == 200) {
-      var result = JSON.parse(http.responseText);
-      headline.topics = [];
-      result.response.coarseTopics.forEach(function(el){
-        headline.topics.push({name: el.label, score: el.score});
-        if(el.score > 0.5) {
-          if(topicsCount[el.label]) {
-            topicsCount[el.label] += el.score;
-          } else {
-            topicsCount[el.label] = el.score;
-          }
-        }
-      });
-      // 5
-    }
+    var headlines = selectedSource.headlines;
+    var topics = {};
+    var functions = headlines.map(function(headline, i) {
+      return analyseHeadline.bind(null, i, topics);
+    });
+    waterfall(headlines, functions, function(err, result) {
+      cb(null, topics);
+    });
   }
-}
 
-function processHeadlines(headlines){
-  headlines.forEach(function(el) {
-    // 4
-    requestConstructor(el);
-  });
-  return topicsCount;
-}
+  // analyzeHeadline. receives: headline index, topics object, headlines object. responds: topics object
+  function analyseHeadline(i, topics, headlines, cb) {
+    var headline = headlines[i];
+    var http = new XMLHttpRequest();
+    var url = 'https://api.textrazor.com/';
+    var params = 'text=' + headline.title + '&extractors=topics';
+    params = encodeURI(params);
 
+    http.open('POST', url, true);
 
-/* Infographic builder */
-function buildInfoGraph(){
+    http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+    http.setRequestHeader('X-TextRazor-Key', apiKeys.textRazorKey);
 
+    http.addEventListener('load', function() {
+      var result = JSON.parse(http.responseText);
+      if(result.response.coarseTopics) {
+        updateTopics(result, topics);
+      }
+      cb(null, headlines);
+    });
+
+    http.send(params);
+  }
+
+  function updateTopics(result, topics) {
+    result.response.coarseTopics.forEach(function(el){
+      if(el.score > 0.5) {
+        if(topics[el.label]) {
+          topics[el.label] += el.score;
+        } else {
+          topics[el.label] = el.score;
+        }
+      }
+    });
+  };
+
+// Infographic builder. receives: topics object. responds: topic object
+function buildInfoGraph(topics, cb){
+    // clear existing infoGraphicContainer content
     if (infoGraphicContainer.children){
       infoGraphicContainer.innerHTML = "";
     };
-    var data = topicsCount;
+
     /* BEM */
     var blockClass = "graph",
         elementClass = blockClass + "__item",
-        modifierClass = [
-          "--color1",
-          "--color2",
-          "--color3",
-          "--color4",
-          "--color5",
-          "--color6",
-          "--color7",
-          "--color8",
-          "--color9",
-          "--color10",
-        ];
+        modifierClass = [1,2,3,4,5,6,7,8,9,10].map(c=> "--color" + c);
 
     /* Create ul */
     var ul = document.createElement("ul");
         ul.classList.add(blockClass);
-
+    // holds index of modifiers
     var colorIndex = 0;
-    /* for each data piece */
-    for (var prop in data) {
 
+    for (var prop in topics) {
         /* Create element */
         var li = document.createElement("li");
             li.textContent = prop;
 
-        /* convert 0-1 float val to percent */
-        var percent = (data[prop] * 100).toFixed(0) + "%";
-
+        /* convert 0-1 float value to percent */
+        var percent = (topics[prop] * 100).toFixed(0) + "%";
             li.style.width = percent;
             li.setAttribute("percent", percent);
 
-
-        /* assign random color modifier */
-        var randomColor = modifierClass[colorIndex];
+        /* assign color modifier */
+        var color = modifierClass[colorIndex];
             colorIndex++;
-
             li.classList.add(elementClass);
-            li.classList.add(elementClass + randomColor);
+            li.classList.add(elementClass + color);
 
         /* add li to ul */
         ul.appendChild(li);
     }
-
     /* add to infoGraphicContainer */
     infoGraphicContainer.appendChild(ul);
+    cb(null, topics);
 }
 
-/* toggle infographic */
-function toggleInfographic(){
+// toggleInfographic. receives: topics object, responds: topic object.
+function toggleInfographic(topics, cb){
   if (infoGraphicContainer.classList.contains("infographic-container--hidden")) {
     infoGraphicContainer.classList.remove("infographic-container--hidden");
     pageTitle.textContent = sourceDropDown.value;
@@ -268,13 +325,7 @@ function toggleInfographic(){
     pageTitle.textContent = "Visualiser News";
     analyzeBtn.textContent = "Analyze";
   }
+  cb(null, topics);
 }
 
-/* Dummy Data */
-var topicsCount = {
-  politics: 0.3,
-  social: 0.3,
-  culture: 0.42,
-  government: 0.143,
-  religion: 0.7
-};
+})();
