@@ -10,17 +10,18 @@
   <title>Visualiser News</title>
 </head>
 <body>
-  <header class="full-width position__fixed position__top">
+  <header id="banner" class="full-width position__fixed position__top">
     <h1 class="align__center">Visualiser News</h1>
   </header>
   <div class="main-container">
     <section id="source-selection" class="container align__center">
       <label>
         <p>Select your source</p>
-        <select class="" name="selectedSource">
+        <select id="source-dropdown" class="" name="selectedSource">
           <option value="BBC News">BBC News</option>
         </select>
       </label>
+      <img id="source-logo" class="align__center" src="http://i.newsapi.org/bbc-news-s.png" alt="selected source logo" />
     </section>
     <section id="infographic" class="container">
 
