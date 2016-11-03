@@ -1,4 +1,4 @@
-window.XMLHttpRequest.prototype.__defaultResponse = {
+window.MockXMLHttpRequest.prototype.__defaultResponse = {
   "response": {
     "coarseTopics": [
       {

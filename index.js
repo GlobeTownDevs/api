@@ -10,25 +10,24 @@ var visualiser = (function() {
   var database = this.database = {};
   var topicsCount = this.topicsCount = {};
 
-  // Waterfall function (no error handling)
-  function waterfall(start, tasks) {
+  // Waterfall function
+  function waterfall(arg, tasks, cb) {
     var next = tasks[0];
     var tail = tasks.slice(1);
     if (typeof next !== 'undefined') {
-      next(start, function(result) {
-        waterfall(result, tail)
+      next(arg, function(err, result) {
+        if(err) { return cb(err); }
+        waterfall(result, tail, cb);
       });
       return;
     }
+    cb(null, arg);
   }
 
-  function normalise(topics) {
-    console.log(topics);
+  // Make values of each topic be between 0 and 1.0
+  function normalise(topics, cb) {
     var maxValue = 0;
-    console.log(Object.assign({}, topics));
-    console.log(Object.keys(topics));
     for(var topic in topics) {
-      console.log(topic);
       if(topics[topic] > maxValue) {
         maxValue = topics[topic];
       }
@@ -36,27 +35,34 @@ var visualiser = (function() {
     for(var topic in topics) {
       topics[topic] = topics[topic] / maxValue;
     }
-    console.log(topics);
+    cb(null, topics);
   }
 
   //// Event Handlers /////
 
   // Window load
   window.addEventListener("load", function(){
-      waterfall(database, [getSources, buildOptions]);
-  })
+      waterfall(database, [getSources, buildOptions], function(err, result) {
+        console.log(err, result);
+      });
+  });
 
   // Dropdown
   sourceDropDown.addEventListener("change", function(){
       deactivateAnalyzeBtn();
       // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
-      waterfall(sourceDropDown.value, [updateLogo, getHeadlines, activateAnalyzeBtn]);
+      waterfall(sourceDropDown.value, [updateLogo, getHeadlines, activateAnalyzeBtn], function(err, result) {
+        console.log(err, result);
+      });
   });
 
   // Analyze
   analyzeBtn.addEventListener("click", function(){
-    topicsCount = {};
-    waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise]);
+    waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, result) {
+      if(err) { throw new Error(err); }
+      var normalisedTopics = result;
+      console.log(normalisedTopics);
+    });
     //var topicsCount = processHeadlines(database[sourceDropDown.value]);
     /* Call function to insert infographic */
   });
@@ -66,7 +72,7 @@ var visualiser = (function() {
   function updateLogo(selectedSource, cb){
     var logoUrl = database[selectedSource]["logo"];
     sourceLogo.src = logoUrl;
-    cb(selectedSource);
+    cb(null, selectedSource);
   }
 
   // function to build options for sourceDropDown select elements
@@ -107,13 +113,14 @@ var visualiser = (function() {
     xhr.addEventListener("load", function(){
       var json = JSON.parse(xhr.responseText);
         json.sources.forEach(function(source){
-          database[source.name] = {};
-          database[source.name]['name'] = source.name;
-          database[source.name]['id']   = source.id;
-          database[source.name]['logo'] = source.urlsToLogos.small;
+          database[source.name] = {
+            name: source.name,
+            id: source.id,
+            logo: source.urlsToLogos.small
+          };
         });
         // 2
-        cb(database);
+        cb(null, database);
     });
     xhr.open('GET', url, true);
     xhr.send();
@@ -134,7 +141,7 @@ var visualiser = (function() {
         delete article["author"];
         database[selectedSource.name]["headlines"].push(article);
       });
-      cb(selectedSource);
+      cb(null, selectedSource);
     });
     xhr.open('GET', url, true);
     xhr.send();
@@ -142,19 +149,19 @@ var visualiser = (function() {
 
   function processHeadlines(selectedSource, cb){
     var headlines = selectedSource.headlines;
-    console.log(headlines.length);
     var topics = {};
-    headlines.forEach(function(el) {
-      requestConstructor(el, topics);
+    var functions = headlines.map(function(headline, i) {
+      return analyseHeadline.bind(null, i, topics);
     });
-    setTimeout(function() {
-      cb(topics);
-    }, 1000);
+    waterfall(headlines, functions, function(err, result) {
+      cb(null, topics);
+    });
   }
 
   // Text Razor requests
-  function requestConstructor(headline, topics) {
-    var http = new XMLHttpRequest();
+  function analyseHeadline(i, topics, headlines, cb) {
+    var headline = headlines[i];
+    var http = new MockXMLHttpRequest();
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
     params = encodeURI(params);
@@ -164,25 +171,27 @@ var visualiser = (function() {
     http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
     http.setRequestHeader('X-TextRazor-Key', apiKeys.textRazorKey);
 
-    http.onreadystatechange = function() {
-      if(http.readyState == 4 && http.status == 200) {
-        var result = JSON.parse(http.responseText);
-        headline.topics = [];
-        if(result.response.coarseTopics) {
-          result.response.coarseTopics.forEach(function(el){
-            headline.topics.push({name: el.label, score: el.score});
-            if(el.score > 0.5) {
-              if(topics[el.label]) {
-                topics[el.label] += el.score;
-              } else {
-                topics[el.label] = el.score;
-              }
-            }
-          });
+    http.addEventListener('load', function() {
+      var result = JSON.parse(http.responseText);
+      if(result.response.coarseTopics) {
+        updateTopics(result, topics);
+      }
+      cb(null, headlines);
+    });
+
+    http.send(params);
+  }
+
+  function updateTopics(result, topics) {
+    result.response.coarseTopics.forEach(function(el){
+      if(el.score > 0.5) {
+        if(topics[el.label]) {
+          topics[el.label] += el.score;
+        } else {
+          topics[el.label] = el.score;
         }
       }
-    };
-    http.send(params);
+    });
   }
 
 })();
