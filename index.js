@@ -172,24 +172,22 @@ var visualiser = (function() {
     var headlines = selectedSource.headlines;
     var topics = {};
     /* Waterfall expects an array of functions, so this prepares one for each headline to be analysed.
-     * .bind is used to give each function an argument 'i' so it knows its place in the list of headlines.
+     * .bind is used to give each function an argument 'headline' so it knows which one to analyse.
      */
-    var headlineHandlers = headlines.map(function(headline, i) {
-      return analyseHeadline.bind(null, i, topics);
+    var headlineHandlers = headlines.map(function(headline) {
+      return analyseHeadline.bind(null, headline);
     });
-    waterfall(headlines, headlineHandlers, function(err, res) {
-      /* The result is the headlines, but we actually want the topic (probably could fix this to be clearer) */
-      cb(null, topics);
+    waterfall(topics, headlineHandlers, function(err, res) {
+      cb(null, res);
     });
   }
 
   // Text Razor requests
-  function analyseHeadline(i, topics, headlines, cb) {
-    var headline = headlines[i];
-    var http = new XMLHttpRequest(); /* TODO - remove mock */
+  function analyseHeadline(headline, topics, cb) {
+    var http = new XMLHttpRequest();
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
-    //params = encodeURI(params);
+
     http.open('POST', url, true);
     http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
     http.setRequestHeader('X-TextRazor-Key', apiKeys.textRazorKey);
@@ -199,7 +197,7 @@ var visualiser = (function() {
       if(json.response.coarseTopics) {
         updateTopics(json, topics);
       }
-      cb(null, headlines);
+      cb(null, topics);
     });
 
     http.send(params);
