@@ -71,6 +71,7 @@ h1 {
 }
 
 .source-selection {
+  height: 190px;
   padding: 20px 0px;
   background-color: #CECC15;
   border-bottom: 1px solid #bab812;
@@ -107,6 +108,8 @@ h1 {
 
 .headline__image {
   max-width: 16%;
+  position: relative;
+  top: 4px;
 }
 
 .headline__title {
@@ -114,11 +117,14 @@ h1 {
   font-size: 1.1em;
   vertical-align: top;
   width: 80%;
+  margin: 0;
+  padding-left: 0.5em;
+  padding-top: 0;
 }
 
 .headline__description {
   display: none;
-  margin: .1em;
+  margin: 0.5em 0;
 }
 
 @media (min-width: 600px) {
