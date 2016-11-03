@@ -63,7 +63,13 @@ function getHeadlines(selectedSource) {
       xhr.send();
 }
 
+function getArticlesMarkup(selectedSource) {
 
+}
+
+function updateArticles() {
+
+}
 
 
 
@@ -121,4 +127,3 @@ function addToggleToHeadlines() {
 window.onload = function() {
   addToggleToHeadlines();
 };
-
