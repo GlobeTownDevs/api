@@ -5,7 +5,8 @@ var newsApiKey = apiKeys.newsApiKey;
 // DOM Elements
 var sourceDropDown = document.getElementById("source-dropdown"),
     analyzeBtn = document.getElementById("analyze"),
-    sourceLogo = document.getElementById("source-logo");
+    sourceLogo = document.getElementById("source-logo"),
+    headLines = document.getElementById("headlines");
 
 // Global Database
 var database = {};
@@ -34,7 +35,7 @@ window.addEventListener("load", function(){
 sourceDropDown.addEventListener("change", function(){
     deactivateAnalyzeBtn();
     // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
-    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, activateAnalyzeBtn]);
+    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles, addToggleToHeadlines, activateAnalyzeBtn]);
 });
 
 // Analyze
@@ -128,6 +129,32 @@ function getHeadlines(selectedSource, cb) {
       xhr.send();
 }
 
+function updateArticles(selectedSource, cb) {
+  headLines.innerHTML = "";
+  selectedSource["headlines"].forEach(function(headline) {
+    // creating new elements
+    var article = document.createElement("article");
+        article.classList.add("headline");
+    var image = document.createElement("img");
+        image.classList.add("headline__image");
+        image.src = headline["urlToImage"];
+    var heading = document.createElement("h1");
+        heading.classList.add("headline__title");
+        heading.textContent = headline["title"];
+    var description = document.createElement("p");
+        description.classList.add("headline__description");
+        description.textContent = headline["description"];
+
+    // populating new elements
+    article.appendChild(image);
+    article.appendChild(heading);
+    article.appendChild(description);
+    // Append to headlines
+    headLines.appendChild(article);
+  });
+  cb(selectedSource);
+}
+
 function updateLogo(selectedSource, cb){
 
   var logoUrl = database[selectedSource]["logo"];
@@ -135,13 +162,6 @@ function updateLogo(selectedSource, cb){
 
   cb(selectedSource);
 }
-
-
-
-
-
-
-
 
 // Text Razor requests
 function requestConstructor(headline) {
