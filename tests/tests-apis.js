@@ -5,7 +5,7 @@ QUnit.test("that we can add topics to the database object", function(assert){
   setTimeout(function(){
     assert.ok(headline.topics, 'Passed!');
     done();
-  },10);
+  },1000);
 });
 
 QUnit.test("that we can add topics to the topicsCount object", function(assert){
@@ -14,5 +14,5 @@ QUnit.test("that we can add topics to the topicsCount object", function(assert){
   setTimeout(function(){
     assert.ok(topicsCount.Politics, 'Passed!');
     done();
-  },10);
+  },1000);
 });
