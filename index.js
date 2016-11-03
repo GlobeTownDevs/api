@@ -182,7 +182,7 @@ var visualiser = (function() {
   // Text Razor requests
   function analyseHeadline(i, topics, headlines, cb) {
     var headline = headlines[i];
-    var http = new MockXMLHttpRequest(); /* TODO - remove mock */
+    var http = new XMLHttpRequest(); /* TODO - remove mock */
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
     //params = encodeURI(params);
