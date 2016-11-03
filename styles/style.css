@@ -23,6 +23,7 @@ button, select {
 .btn:hover {
   background-color: #CECC15;
   color: white;
+  cursor: pointer;
 }
 
 h1 {
