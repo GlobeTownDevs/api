@@ -1,3 +1,5 @@
+/*General rules*/
+
 * {
   box-sizing: border-box;
   font-size: 16px;
@@ -7,6 +9,27 @@ body {
   background-color: #f4f4f4;
   padding-bottom: 50px;
 }
+
+button, select {
+  font-size: 1.0em;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #444;
+  text-shadow: 1px 0px #eee;
+  border-radius: 2px;
+  height: 35px;
+}
+
+.btn:hover {
+  background-color: #CECC15;
+  color: white;
+}
+
+h1 {
+    margin: 0.1em;
+}
+
+/*Header, selection source and toggle button*/
 
 .full-width {
   width: 100%;
@@ -28,7 +51,8 @@ body {
 }
 
 .main-container {
-  padding-top: 40px;
+  padding-top: 50px;
+  margin-top: 0;
 }
 
 .align__center {
@@ -37,15 +61,36 @@ body {
   display: block;
 }
 
-header,
-#toggle-analysis {
+#banner, #toggle-analysis {
   padding: 10px 0;
+  margin: 0;
   min-height: 30px;
-  background-color: #fff;
+  background-color: rgb(10,10,10);
+  color: #fff;
 }
 
-h1 {
-  margin: 0.1em;
+.source-selection {
+  padding: 20px 0px;
+  background-color: #CECC15;
+  border-bottom: 1px solid #bab812;
+  margin-top: 0;
+}
+
+.source-selection__label {
+  font-size: 0.75em;
+  color: #3a3a04;
+  letter-spacing: 0.1em;
+}
+
+.source-selection__dropdown {
+  min-width: 120px;
+}
+
+.source-selection__logo {
+  width: 20%;
+  display: block;
+  margin-top: 0.5em;
+  border-radius: 5px;
 }
 
 /* Headline articles */
@@ -86,8 +131,17 @@ h1 {
 }
 
 @media (min-width: 1000px) {
+
+  body {
+    padding-bottom: 100px;
+  }
+
   #headlines {
     column-count: 2;
+  }
+
+  .source-selection__logo {
+    width: 10%;
   }
 
   .headline {
