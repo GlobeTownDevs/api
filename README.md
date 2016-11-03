@@ -8,6 +8,23 @@ The aim of our api is to take the top ten news headlines from [News API](https:/
 - 'Get the news' would return headline links to news features
 - 'Analyse the news' would return the infographic
 
+#### Wireframes
+- Mobile-first landing page
+
+![mobile-first landing page](images/Default page.png)
+
+- Mobile-first landing page with expanded headlines content
+
+![mobile-first landing page with extra content](images/Opened news item.png)
+
+- Mobile-first infographic page
+
+![mobile-first page with infogrpahic](images/Infographic.png)
+
+- Desktop landing page
+
+![desktop landing page](images/Browser.png)
+
 #### Bonus
 - Analysis of the category emphasis of individual publications (eg Guardian, BBC, Telegraph, Daily Mail)
 - User can click button to translate news into 'talk like a pirate'
