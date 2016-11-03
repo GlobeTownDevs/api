@@ -1,5 +1,7 @@
 *
 {
+  border: 1px solid black;
+  box-sizing: border-box;
   font-size: 16px;
 }
 
@@ -36,4 +38,39 @@ header,#toggle-analysis {
   padding: 10px 0;
   min-height: 30px;
   background-color: #fff;
+
+h1 {
+    margin: 0.1em;
 }
+
+/* Headline articles */
+
+.headline {
+  padding: 1%;
+  width: 100%;
+}
+
+.headline__image {
+    max-width: 16%;
+}
+
+.headline__title {
+  display: inline-block;
+  font-size: 1.2em;
+  vertical-align: top;
+  width: 80%;
+}
+
+.headline__description {
+  display: none;
+  margin: .1em;
+}
+
+@media (min-width: 600px) {
+  .headline {
+    max-width: 50%;
+  }
+
+  .headline__description {
+    display: inherit;
+  }
