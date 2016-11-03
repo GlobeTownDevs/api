@@ -137,7 +137,9 @@ function updateArticles(selectedSource, cb) {
         article.classList.add("headline");
     var image = document.createElement("img");
         image.classList.add("headline__image");
-        image.src = headline["urlToImage"];
+        // Default to source logo when headline logo is not available
+        if(headline["urlToImage"]) image.src = headline["urlToImage"];
+        else image.src = selectedSource["logo"];
     var heading = document.createElement("h1");
         heading.classList.add("headline__title");
         heading.textContent = headline["title"];
