@@ -2,16 +2,72 @@
 var textRazorKey = apiKeys.textRazorKey;
 var newsApiKey = apiKeys.newsApiKey;
 
-// Example db //
+// DOM Elements
+var sourceDropDown = document.getElementById("source-dropdown"),
+    analyzeBtn = document.getElementById("analyze");
+
+
+// Global Database
 var database = {};
 
-// News API requests
+// Waterfall function (no error handling)
+function waterfall(start, tasks) {
+  var next = tasks[0];
+  var tail = tasks.slice(1);
+  if (typeof next !== 'undefined') {
+    next(start, function(result) {
+      waterfall(result, tail)
+    })
+    return ;
+  }
+}
 
-/* getSources
-retrieves news sources, stores in database object
-needs getSources() on window load!
-*/
-function getSources(){
+
+//// Event Handlers /////
+
+// Window load
+window.addEventListener("load", function(){
+    waterfall(database, [getSources, buildOptions]);
+})
+
+// Dropdown
+sourceDropDown.addEventListener("change", function(){
+    deactivateAnalyzeBtn();
+    // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
+    waterfall(sourceDropDown.value, [getHeadlines, activateAnalyzeBtn]);
+});
+
+// Analyze
+analyzeBtn.addEventListener("click", function(){
+    // here we need functions to process headlines...
+});
+
+
+
+
+// function to build options for sourceDropDown select elements
+function buildOptions(database){
+    for (var source in database){
+        var option = document.createElement("option");
+            option.textContent = source;
+            option.value = source;
+        sourceDropDown.appendChild(option);
+    };
+};
+
+
+// activate/deactivate analyzeBtn;
+function activateAnalyzeBtn(){
+  analyzeBtn.disabled = false;
+};
+
+function deactivateAnalyzeBtn(){
+  analyzeBtn.disabled = true;
+};
+
+
+// 1. getSources called on window load
+function getSources(database, cb){
 
     var url = "https://newsapi.org/v1/sources?language=en&country=gb";
         url += "&apikey=" + newsApiKey;
@@ -26,38 +82,34 @@ function getSources(){
                     database[source.name]['id']   = source.id;
                     database[source.name]['logo'] = source.urlsToLogos.small;
                 });
-                console.log(database);
-                // this will be removed when we implement a callback/waterfall/eventListener
-                getHeadlines(database["BBC News"]);
+                // 2
+                cb(database);
         });
         xhr.open('GET', url, true);
         xhr.send();
-
 }
 
-// 1st make sources request, store results in array with sources
 
 
-/* getHeadlines
-retrieves first 10 headlines for a selected source
-*/
+// 2. getHeadlines, accepts db object name and retrieves headlines
 
-getSources();
+function getHeadlines(selectedSource, cb) {
 
+    selectedSource = database[selectedSource];
 
-function getHeadlines(selectedSource) {
   var url = "https://newsapi.org/v1/articles?";
       url += "source=" + selectedSource.id + "&apikey=" + newsApiKey;
 
   var xhr = new XMLHttpRequest();
       xhr.addEventListener("load", function(){
+        // This will store all headlines to db
         var json = JSON.parse(xhr.responseText);
         database[selectedSource.name]["headlines"] = [];
         json.articles.forEach(function(article) {
           delete article["author"];
           database[selectedSource.name]["headlines"].push(article);
         });
-        console.log(database);
+        cb(selectedSource);
       });
       xhr.open('GET', url, true);
       xhr.send();
@@ -67,16 +119,24 @@ function getHeadlines(selectedSource) {
 
 
 
+
+
+
 // Text Razor requests
 function requestConstructor(headline) {
   var http = new XMLHttpRequest();
-  var url = "https://api.textrazor.com";
-  var params = "text=" + headline.title.replace(/\s/g, '+') + "&extractors=topics";
+      http.withCredentials = true;
+  var url = "https://api.textrazor.com/";
+  var params = "text=" + headline.title + "&extractors=topics";
+      params = encodeURI(params);
+  console.log(params)
 
   http.open("POST", url, true);
 
-  http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  http.setRequestHeader("content-type", "application/x-www-form-urlencoded");
   http.setRequestHeader("X-TextRazor-Key", textRazorKey);
+  http.send(params);
+  // http.setRequestHeader("cache-control", "no-cache");
 
   http.onreadystatechange = function() {
     if(http.readyState == 4 && http.status == 200) {
@@ -92,13 +152,16 @@ function requestConstructor(headline) {
           }
         }
       });
+      // 5
+      console.log(database);
+      console.log(topicsCount);
     }
   }
-  http.send(params);
 }
 
 function processHeadlines(headlines){
   headlines.forEach(function(el) {
+    // 4
     requestConstructor(el);
   });
   return topicsCount;
