@@ -4,8 +4,8 @@ var newsApiKey = apiKeys.newsApiKey;
 
 // DOM Elements
 var sourceDropDown = document.getElementById("source-dropdown"),
-    analyzeBtn = document.getElementById("analyze");
-
+    analyzeBtn = document.getElementById("analyze"),
+    sourceLogo = document.getElementById("source-logo");
 
 // Global Database
 var database = {};
@@ -34,7 +34,7 @@ window.addEventListener("load", function(){
 sourceDropDown.addEventListener("change", function(){
     deactivateAnalyzeBtn();
     // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
-    waterfall(sourceDropDown.value, [getHeadlines, activateAnalyzeBtn]);
+    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, activateAnalyzeBtn]);
 });
 
 // Analyze
@@ -129,17 +129,19 @@ function getHeadlines(selectedSource, cb) {
 }
 
 function getArticlesMarkup(selectedSource) {
-
 }
 
 function updateArticles() {
 
 }
 
+function updateLogo(selectedSource, cb){
 
+  var logoUrl = database[selectedSource]["logo"];
+      sourceLogo.src = logoUrl;
 
-
-
+  cb(selectedSource);
+}
 
 // Text Razor requests
 function requestConstructor(headline) {
