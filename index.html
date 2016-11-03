@@ -2,16 +2,41 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.0.1.css">
-  <title>News API app</title>
+  <meta name="description" content="A website to get trending headlines and analyse news">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="styles/normalize.css" type="text/css" rel="stylesheet">
+  <link href="styles/style.css" type="text/css" rel="stylesheet">
+  <title>Visualiser News</title>
 </head>
 <body>
+  <header id="banner" class="full-width position__fixed position__top">
+    <h1 class="align__center">Visualiser News</h1>
+  </header>
+  <div class="main-container">
+    <section class="source-selection container align__center">
+      <p class="source-selection__label">Select your source</p>
+      <select class="source-selection__dropdown" name="selectedSource" id="source-dropdown">
+        <!-- <option value="BBC News">BBC News</option> -->
+      </select>
+      <img class="source-selection__logo align__center" src="http://i.newsapi.org/bbc-news-s.png" alt="selected source logo" />
+    </section>
 
-    <select id="source-dropdown"></select>
+    <section id="infographic" class="container">
+    </section>
 
-    <section id="headlines"></section>
-    <button id="analyze" disabled>Analyze</button>
+    <section id="headlines" class="container">
+      <!-- <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article> -->
+    </section>
+  </div>
+
+  <div id="toggle-analysis" class="full-width position__fixed position__bottom">
+    <button type="button" id="analyze" name="toggle-analyse" class="btn align__center">Analyse</button>
+  </div>
+
 
   <script type="text/javascript" src="api-keys.js"></script>
   <script type="text/javascript" src="index.js"></script>
