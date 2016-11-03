@@ -19,11 +19,21 @@ button, select {
   border-radius: 2px;
   height: 35px;
 }
-
+.btn {
+  outline: none;
+}
 .btn:hover {
   background-color: #CECC15;
   color: white;
   cursor: pointer;
+}
+
+/* Disabled */
+.btn:disabled {
+  color: grey;
+}
+.btn:disabled:hover {
+  background-color: #fff;
 }
 
 h1 {

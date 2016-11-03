@@ -2,13 +2,15 @@
 var visualiser = (function() {
 
   // DOM Elements
-  var sourceDropDown = document.getElementById("source-dropdown"),
-      analyzeBtn = document.getElementById("analyze"),
-      sourceLogo = document.getElementById("source-logo");
+  var sourceDropDown = document.getElementById('source-dropdown'),
+    analyzeBtn = document.getElementById('analyze'),
+    sourceLogo = document.getElementById('source-logo'),
+    headLines = document.getElementById('headlines'),
+    infoGraphicContainer = document.getElementById('infographic-container'),
+    pageTitle = document.getElementById('page-title');
 
-  // Global variables
-  var database = this.database = {};
-  var topicsCount = this.topicsCount = {};
+  // Global database
+  var database = {};
 
   // Waterfall function
   function waterfall(arg, tasks, cb) {
@@ -26,7 +28,7 @@ var visualiser = (function() {
 
   // Make values of each topic be between 0 and 1.0
   function normalise(topics, cb) {
-    var maxValue = 0;
+    var maxValue = 1;
     for(var topic in topics) {
       if(topics[topic] > maxValue) {
         maxValue = topics[topic];
@@ -41,57 +43,41 @@ var visualiser = (function() {
   //// Event Handlers /////
 
   // Window load
-  window.addEventListener("load", function(){
-      waterfall(database, [getSources, buildOptions], function(err, result) {
-        console.log(err, result);
-      });
+  window.addEventListener('load', function(){
+    waterfall(database, [getSources], function(err, res) {
+      if(err) { throw new Error(err); }
+      buildOptions(res);
+    });
   });
 
   // Dropdown
-  sourceDropDown.addEventListener("change", function(){
-      deactivateAnalyzeBtn();
-      // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
-      waterfall(sourceDropDown.value, [updateLogo, getHeadlines, activateAnalyzeBtn], function(err, result) {
-        console.log(err, result);
-      });
+  sourceDropDown.addEventListener('change', function(){
+    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles], function(err, res) {
+      if(err) { throw new Error(err); }
+      addToggleToHeadlines();
+      analyzeBtn.disabled = false;
+    });
   });
 
   // Analyze
-  analyzeBtn.addEventListener("click", function(){
-    waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, result) {
+  analyzeBtn.addEventListener('click', function(){
+    waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, res) {
       if(err) { throw new Error(err); }
-      var normalisedTopics = result;
-      console.log(normalisedTopics);
+      buildInfoGraph(res);
+      toggleInfographic();
     });
-    //var topicsCount = processHeadlines(database[sourceDropDown.value]);
-    /* Call function to insert infographic */
   });
 
-  //// Async functions ////
-
-  function updateLogo(selectedSource, cb){
-    var logoUrl = database[selectedSource]["logo"];
-    sourceLogo.src = logoUrl;
-    cb(null, selectedSource);
-  }
+  //// Waterfall end functions ////
 
   // function to build options for sourceDropDown select elements
   function buildOptions(database){
     for (var source in database){
-      var option = document.createElement("option");
+      var option = document.createElement('option');
       option.textContent = source;
       option.value = source;
       sourceDropDown.appendChild(option);
     }
-  }
-
-  // activate/deactivate analyzeBtn;
-  function activateAnalyzeBtn(){
-    analyzeBtn.disabled = false;
-  }
-
-  function deactivateAnalyzeBtn(){
-    analyzeBtn.disabled = true;
   }
 
   // Add onClick functionality when headlines loaded
@@ -105,41 +91,40 @@ var visualiser = (function() {
     }
   }
 
+  //// Async functions ////
+
   // 1. getSources called on window load
   function getSources(database, cb){
-
-    var url = "https://newsapi.org/v1/sources?language=en&country=gb" + "&apikey=" + apiKeys.newsApiKey;
+    var url = 'https://newsapi.org/v1/sources?language=en&country=gb' + '&apikey=' + apiKeys.newsApiKey;
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", function(){
+    xhr.addEventListener('load', function(){
       var json = JSON.parse(xhr.responseText);
-        json.sources.forEach(function(source){
-          database[source.name] = {
-            name: source.name,
-            id: source.id,
-            logo: source.urlsToLogos.small
-          };
-        });
-        // 2
-        cb(null, database);
+      json.sources.forEach(function(source){
+        database[source.name] = {
+          name: source.name,
+          id: source.id,
+          logo: source.urlsToLogos.small
+        };
+      });
+      cb(null, database);
     });
     xhr.open('GET', url, true);
     xhr.send();
   }
 
   // 2. getHeadlines, accepts db object name and retrieves headlines
+  function getHeadlines(source, cb) {
+    var selectedSource = database[source];
 
-  function getHeadlines(selectedSource, cb) {
-    selectedSource = database[selectedSource];
-
-    var url = "https://newsapi.org/v1/articles?" + "source=" + selectedSource.id + "&apikey=" + apiKeys.newsApiKey;
+    var url = 'https://newsapi.org/v1/articles?' + 'source=' + selectedSource.id + '&apikey=' + apiKeys.newsApiKey;
     var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", function(){
+    xhr.addEventListener('load', function(){
       // This will store all headlines to db
       var json = JSON.parse(xhr.responseText);
-      database[selectedSource.name]["headlines"] = [];
+      database[selectedSource.name]['headlines'] = [];
       json.articles.forEach(function(article) {
-        delete article["author"];
-        database[selectedSource.name]["headlines"].push(article);
+        delete article['author'];
+        database[selectedSource.name]['headlines'].push(article);
       });
       cb(null, selectedSource);
     });
@@ -147,13 +132,49 @@ var visualiser = (function() {
     xhr.send();
   }
 
+  function updateLogo(selectedSource, cb){
+    var logoUrl = database[selectedSource]['logo'];
+    sourceLogo.src = logoUrl;
+    cb(null, selectedSource);
+  }
+
+  function updateArticles(selectedSource, cb) {
+    headLines.innerHTML = '';
+    selectedSource['headlines'].forEach(function(headline) {
+      // creating new elements
+      var article = document.createElement('article');
+          article.classList.add('headline');
+      var image = document.createElement('img');
+          image.classList.add('headline__image');
+          image.src = headline['urlToImage'];
+      var heading = document.createElement('h1');
+          heading.classList.add('headline__title');
+          heading.textContent = headline['title'];
+      var description = document.createElement('p');
+          description.classList.add('headline__description');
+          description.textContent = headline['description'];
+
+      // populating new elements
+      article.appendChild(image);
+      article.appendChild(heading);
+      article.appendChild(description);
+      // Append to headlines
+      headLines.appendChild(article);
+    });
+    cb(null, selectedSource);
+  }
+
   function processHeadlines(selectedSource, cb){
     var headlines = selectedSource.headlines;
     var topics = {};
-    var functions = headlines.map(function(headline, i) {
+    /* Waterfall expects an array of functions, so this prepares one for each headline to be analysed.
+     * .bind is used to give each function an argument 'i' so it knows its place in the list of headlines.
+     */
+    var headlineHandlers = headlines.map(function(headline, i) {
       return analyseHeadline.bind(null, i, topics);
     });
-    waterfall(headlines, functions, function(err, result) {
+    waterfall(headlines, headlineHandlers, function(err, res) {
+      /* The result is the headlines, but we actually want the topic (probably could fix this to be clearer) */
       cb(null, topics);
     });
   }
@@ -161,20 +182,19 @@ var visualiser = (function() {
   // Text Razor requests
   function analyseHeadline(i, topics, headlines, cb) {
     var headline = headlines[i];
-    var http = new MockXMLHttpRequest();
+    var http = new MockXMLHttpRequest(); /* TODO - remove mock */
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
-    params = encodeURI(params);
+    //params = encodeURI(params);
 
     http.open('POST', url, true);
-
     http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
     http.setRequestHeader('X-TextRazor-Key', apiKeys.textRazorKey);
 
     http.addEventListener('load', function() {
-      var result = JSON.parse(http.responseText);
-      if(result.response.coarseTopics) {
-        updateTopics(result, topics);
+      var json = JSON.parse(http.responseText);
+      if(json.response.coarseTopics) {
+        updateTopics(json, topics);
       }
       cb(null, headlines);
     });
@@ -182,8 +202,8 @@ var visualiser = (function() {
     http.send(params);
   }
 
-  function updateTopics(result, topics) {
-    result.response.coarseTopics.forEach(function(el){
+  function updateTopics(json, topics) {
+    json.response.coarseTopics.forEach(function(el){
       if(el.score > 0.5) {
         if(topics[el.label]) {
           topics[el.label] += el.score;
@@ -192,6 +212,74 @@ var visualiser = (function() {
         }
       }
     });
+  }
+
+  /* Infographic builder */
+  function buildInfoGraph(data){
+
+    if (infoGraphicContainer.children){
+      infoGraphicContainer.innerHTML = '';
+    }
+    /* BEM */
+    var blockClass = 'graph',
+        elementClass = blockClass + '__item',
+        modifierClass = [
+          '--color1',
+          '--color2',
+          '--color3',
+          '--color4',
+          '--color5',
+          '--color6',
+          '--color7',
+          '--color8',
+          '--color9',
+          '--color10',
+        ];
+
+    /* Create ul */
+    var ul = document.createElement('ul');
+        ul.classList.add(blockClass);
+
+    var colorIndex = 0;
+    /* for each data piece */
+    for (var prop in data) {
+
+      /* Create element */
+      var li = document.createElement('li');
+          li.textContent = prop;
+
+      /* convert 0-1 float val to percent */
+      var percent = (data[prop] * 100).toFixed(0) + '%';
+
+      li.style.width = percent;
+      li.setAttribute('percent', percent);
+
+      /* assign random color modifier */
+      var randomColor = modifierClass[colorIndex];
+      colorIndex++;
+
+      li.classList.add(elementClass);
+      li.classList.add(elementClass + randomColor);
+
+      /* add li to ul */
+      ul.appendChild(li);
+    }
+
+    /* add to infoGraphicContainer */
+    infoGraphicContainer.appendChild(ul);
+  }
+
+  /* toggle infographic */
+  function toggleInfographic(){
+    if (infoGraphicContainer.classList.contains('infographic-container--hidden')) {
+      infoGraphicContainer.classList.remove('infographic-container--hidden');
+      pageTitle.textContent = sourceDropDown.value;
+      analyzeBtn.textContent = 'Back';
+    } else {
+      infoGraphicContainer.classList.add('infographic-container--hidden');
+      pageTitle.textContent = 'Visualiser News';
+      analyzeBtn.textContent = 'Analyze';
+    }
   }
 
 })();
