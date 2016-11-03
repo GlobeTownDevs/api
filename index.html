@@ -2,11 +2,70 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.0.1.css">
-  <title>News API app</title>
+  <meta charset="utf-8">
+  <meta name="description" content="A website to get trending headlines and analyse news">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="styles/normalize.css" type="text/css" rel="stylesheet">
+  <link href="/css/style.css" type="text/css" rel="stylesheet">
+  <title>Visualiser News</title>
 </head>
 <body>
+  <header class="full-width position__fixed position__top">
+    <h1>Visualiser News</h1>
+  </header>
+  <div class="main-container">
+    <section id="source-selection" class="container">
+      <label>
+        <p>Select your source</p>
+        <select class="" name="selectedSource">
+          <option value="BBC News">BBC News</option>
+        </select>
+      </label>
+    </section>
+    <section id="infographic" class="container">
+
+    </section>
+    <section id="headlines" class="container">
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+      <article class="headline">
+        <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRVSE1gJs209743eC70mLgLvE1-LrRi63n2410DuGFaaXVwmWa3dzSnaODQnw" alt="" class="headline__image" />
+        <h1 class="headline__title">Whatsapp is now encypted!</h1>
+        <p class="headline__description">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+      </article>
+    </section>
+  </div>
+  <div class="full-width position__fixed position__bottom">
+    <button type="button" name="toggle-analysis">Analyse</button>
+  </div>
   <script type="text/javascript" src="api-keys.js"></script>
   <script type="text/javascript" src="index.js"></script>
 </body>
