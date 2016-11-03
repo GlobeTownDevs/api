@@ -5,6 +5,7 @@
 
 body {
   background-color: #f4f4f4;
+  padding-bottom: 50px;
 }
 
 .full-width {
@@ -81,5 +82,16 @@ h1 {
 
   .headline__description {
     display: inherit;
+  }
+}
+
+@media (min-width: 1200px) {
+  #headlines {
+    column-count: 2;
+  }
+
+  .headline {
+    max-width: 80%;
+    break-inside: avoid-column;
   }
 }
