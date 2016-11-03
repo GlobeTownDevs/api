@@ -1,4 +1,4 @@
-window.XMLHttpRequest.prototype.__defaultResponse = {
+window.MockXMLHttpRequest.prototype.__defaultResponse = {
   "response": {
     "coarseTopics": [
       {
@@ -11,19 +11,19 @@ window.XMLHttpRequest.prototype.__defaultResponse = {
         "id": 1,
         "label": "Business",
         "wikiLink": "http://en.wikipedia.org/Category:Business",
-        "score": 0.4865
+        "score": 0.8865
       },
       {
         "id": 2,
         "label": "Culture",
         "wikiLink": "http://en.wikipedia.org/Category:Culture",
-        "score": 0.2793
+        "score": 0.6793
       },
       {
         "id": 3,
         "label": "Violence",
         "wikiLink": "http://en.wikipedia.org/Category:Violence",
-        "score": 0.1698
+        "score": 0.5698
       },
       {
         "id": 4,
