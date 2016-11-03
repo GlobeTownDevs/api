@@ -105,3 +105,20 @@ function processHeadlines(headlines){
 }
 
 var topicsCount = {};
+
+/* Event handlers */
+
+function addToggleToHeadlines() {
+  var headlines = document.querySelectorAll('.headline');
+  for(var i = 0; i < headlines.length; i++) {
+    headlines[i].addEventListener('click', function() {
+      var description = this.querySelector('p');
+      description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+    });
+  }
+}
+
+window.onload = function() {
+  addToggleToHeadlines();
+};
+
