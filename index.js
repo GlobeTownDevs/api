@@ -6,7 +6,9 @@ var newsApiKey = apiKeys.newsApiKey;
 var sourceDropDown = document.getElementById("source-dropdown"),
     analyzeBtn = document.getElementById("analyze"),
     sourceLogo = document.getElementById("source-logo"),
-    headLines = document.getElementById("headlines");
+    headLines = document.getElementById("headlines"),
+    infoGraphicContainer = document.getElementById("infographic-container"),
+    pageTitle = document.getElementById("page-title");
 
 // Global Database
 var database = {};
@@ -33,14 +35,14 @@ window.addEventListener("load", function(){
 
 // Dropdown
 sourceDropDown.addEventListener("change", function(){
-    deactivateAnalyzeBtn();
-    // Marina: waterfall function below needs function between getHeadlines and activayeAnalyze...
-    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles, addToggleToHeadlines, activateAnalyzeBtn]);
+    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles, addToggleToHeadlines]);
+    analyzeBtn.disabled = false;
 });
 
 // Analyze
 analyzeBtn.addEventListener("click", function(){
-    // here we need functions to process headlines...
+  buildInfoGraph();
+  toggleInfographic();
 });
 
 
@@ -57,15 +59,6 @@ function buildOptions(database){
 };
 
 
-// activate/deactivate analyzeBtn;
-function activateAnalyzeBtn(){
-  analyzeBtn.disabled = false;
-};
-
-function deactivateAnalyzeBtn(){
-  analyzeBtn.disabled = true;
-};
-
 
 // Add onClick functionality when headlines loaded
 function addToggleToHeadlines() {
@@ -75,7 +68,7 @@ function addToggleToHeadlines() {
       var description = this.querySelector('p');
       description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
     });
-  }
+  };
 }
 
 
@@ -194,8 +187,6 @@ function requestConstructor(headline) {
         }
       });
       // 5
-      console.log(database);
-      console.log(topicsCount);
     }
   }
 }
@@ -208,4 +199,82 @@ function processHeadlines(headlines){
   return topicsCount;
 }
 
-var topicsCount = {};
+
+/* Infographic builder */
+function buildInfoGraph(){
+
+    if (infoGraphicContainer.children){
+      infoGraphicContainer.innerHTML = "";
+    };
+    var data = topicsCount;
+    /* BEM */
+    var blockClass = "graph",
+        elementClass = blockClass + "__item",
+        modifierClass = [
+          "--color1",
+          "--color2",
+          "--color3",
+          "--color4",
+          "--color5",
+          "--color6",
+          "--color7",
+          "--color8",
+          "--color9",
+          "--color10",
+        ];
+
+    /* Create ul */
+    var ul = document.createElement("ul");
+        ul.classList.add(blockClass);
+
+    var colorIndex = 0;
+    /* for each data piece */
+    for (var prop in data) {
+
+        /* Create element */
+        var li = document.createElement("li");
+            li.textContent = prop;
+
+        /* convert 0-1 float val to percent */
+        var percent = (data[prop] * 100).toFixed(0) + "%";
+
+            li.style.width = percent;
+            li.setAttribute("percent", percent);
+
+
+        /* assign random color modifier */
+        var randomColor = modifierClass[colorIndex];
+            colorIndex++;
+
+            li.classList.add(elementClass);
+            li.classList.add(elementClass + randomColor);
+
+        /* add li to ul */
+        ul.appendChild(li);
+    }
+
+    /* add to infoGraphicContainer */
+    infoGraphicContainer.appendChild(ul);
+}
+
+/* toggle infographic */
+function toggleInfographic(){
+  if (infoGraphicContainer.classList.contains("infographic-container--hidden")) {
+    infoGraphicContainer.classList.remove("infographic-container--hidden");
+    pageTitle.textContent = sourceDropDown.value;
+    analyzeBtn.textContent = "Back";
+  } else {
+    infoGraphicContainer.classList.add("infographic-container--hidden");
+    pageTitle.textContent = "Visualiser News";
+    analyzeBtn.textContent = "Analyze";
+  }
+}
+
+/* Dummy Data */
+var topicsCount = {
+  politics: 0.3,
+  social: 0.3,
+  culture: 0.42,
+  government: 0.143,
+  religion: 0.7
+};
