@@ -61,11 +61,15 @@ var visualiser = (function() {
 
   // Analyze
   analyzeBtn.addEventListener('click', function(){
-    waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, res) {
-      if(err) { throw new Error(err); }
-      buildInfoGraph(res);
+    if(infographicVisible()) {
       toggleInfographic();
-    });
+    } else {
+      waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, res) {
+        if(err) { throw new Error(err); }
+        buildInfoGraph(res);
+        toggleInfographic();
+      });
+    }
   });
 
   //// Waterfall end functions ////
@@ -186,7 +190,6 @@ var visualiser = (function() {
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
     //params = encodeURI(params);
-
     http.open('POST', url, true);
     http.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
     http.setRequestHeader('X-TextRazor-Key', apiKeys.textRazorKey);
@@ -200,6 +203,7 @@ var visualiser = (function() {
     });
 
     http.send(params);
+
   }
 
   function updateTopics(json, topics) {
@@ -271,7 +275,7 @@ var visualiser = (function() {
 
   /* toggle infographic */
   function toggleInfographic(){
-    if (infoGraphicContainer.classList.contains('infographic-container--hidden')) {
+    if (!infographicVisible()) {
       infoGraphicContainer.classList.remove('infographic-container--hidden');
       pageTitle.textContent = sourceDropDown.value;
       analyzeBtn.textContent = 'Back';
@@ -280,6 +284,10 @@ var visualiser = (function() {
       pageTitle.textContent = 'Visualiser News';
       analyzeBtn.textContent = 'Analyze';
     }
+  }
+
+  function infographicVisible() {
+    return !infoGraphicContainer.classList.contains('infographic-container--hidden');
   }
 
 })();
