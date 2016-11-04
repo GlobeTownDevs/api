@@ -79,7 +79,7 @@ var visualiser = (function() {
 
   // Analyze load/ready state functions
   var analyzeButtonLoading = this.analyzeButtonLoading = function(arg, cb){
-    analyzeBtn.textContent="loading";
+    analyzeBtn.textContent="Loading";
     analyzeBtn.disabled = true;
     cb(null, arg);
   }
