@@ -47,9 +47,7 @@ var visualiser = (function() {
 
   // Window load
   window.addEventListener('load', function(){
-    waterfall(database, [getSources], function(err, res) {
-      if(err) { throw new Error(err); }
-      buildOptions(res);
+    waterfall(database, [getSources, buildOptions, updateLogo, getHeadlines, updateArticles,analyzeButtonReady], function(err, res){
     });
   });
 
@@ -91,13 +89,14 @@ var visualiser = (function() {
   }
 
   // function to build options for sourceDropDown select elements
-  var buildOptions = this.buildOptions = function(database){
+  var buildOptions = this.buildOptions = function(database, cb){
     for (var source in database){
       var option = document.createElement('option');
       option.textContent = source;
       option.value = source;
       sourceDropDown.appendChild(option);
     }
+    cb(null, sourceDropDown.value);
   }
 
   // Add onClick functionality when headlines loaded
