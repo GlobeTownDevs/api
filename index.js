@@ -13,7 +13,7 @@ var visualiser = (function() {
   var database = {};
 
   // Waterfall function
-  function waterfall(arg, tasks, cb) {
+  var waterfall = this.waterfall = function (arg, tasks, cb) {
     var next = tasks[0];
     var tail = tasks.slice(1);
     if (typeof next !== 'undefined') {
@@ -27,7 +27,7 @@ var visualiser = (function() {
   }
 
   // Make values of each topic be between 0 and 1.0
-  function normalise(topics, cb) {
+  var normalise = this.normalise = function(topics, cb) {
     var maxValue = 1;
     for(var topic in topics) {
       if(topics[topic] > maxValue) {
@@ -75,20 +75,20 @@ var visualiser = (function() {
   //// Waterfall end functions ////
 
   // Analyze load/ready state functions
-  function analyzeButtonLoading(arg, cb){
+  var analyzeButtonLoading = this.analyzeButtonLoading = function(arg, cb){
     analyzeBtn.textContent="loading";
     analyzeBtn.disabled = true;
     cb(null, arg);
   }
 
-  function analyzeButtonReady(arg, cb){
+  var analyzeButtonReady = this.analyzeButtonReady = function(arg, cb){
     analyzeBtn.textContent="Analyze";
     analyzeBtn.disabled = false;
     cb(null, arg);
   }
 
   // function to build options for sourceDropDown select elements
-  function buildOptions(database){
+  var buildOptions = this.buildOptions = function(database){
     for (var source in database){
       var option = document.createElement('option');
       option.textContent = source;
@@ -98,7 +98,7 @@ var visualiser = (function() {
   }
 
   // Add onClick functionality when headlines loaded
-  function addToggleToHeadlines() {
+  var addToggleToHeadlines = this.addToggleToHeadlines = function() {
     var headlines = document.querySelectorAll('.headline');
     for(var i = 0; i < headlines.length; i++) {
       headlines[i].addEventListener('click', function() {
@@ -149,13 +149,13 @@ var visualiser = (function() {
     xhr.send();
   }
 
-  function updateLogo(selectedSource, cb){
+  var updateLogo = this.updateLogo = function (selectedSource, cb){
     var logoUrl = database[selectedSource]['logo'];
     sourceLogo.src = logoUrl;
     cb(null, selectedSource);
   }
 
-  function updateArticles(selectedSource, cb) {
+  var updateArticles = this.updateArticles = function(selectedSource, cb) {
     headLines.innerHTML = '';
     selectedSource['headlines'].forEach(function(headline) {
       // creating new elements
@@ -181,7 +181,7 @@ var visualiser = (function() {
     cb(null, selectedSource);
   }
 
-  function processHeadlines(selectedSource, cb){
+  var processHeadlines = this.processHeadlines = function(selectedSource, cb){
     var headlines = selectedSource.headlines;
     var topics = {};
     /* Waterfall expects an array of functions, so this prepares one for each headline to be analysed.
@@ -196,7 +196,7 @@ var visualiser = (function() {
   }
 
   // Text Razor requests
-  function analyseHeadline(headline, topics, cb) {
+  var analyseHeadline = this.analyseHeadline = function(headline, topics, cb) {
     var http = new XMLHttpRequest();
     var url = 'https://api.textrazor.com/';
     var params = 'text=' + headline.title + '&extractors=topics';
@@ -217,7 +217,7 @@ var visualiser = (function() {
 
   }
 
-  function updateTopics(json, topics) {
+  var updateTopics = this.updateTopics = function(json, topics) {
     json.response.coarseTopics.forEach(function(el){
       if(el.score > 0.5) {
         if(topics[el.label]) {
@@ -230,7 +230,7 @@ var visualiser = (function() {
   }
 
   /* Infographic builder */
-  function buildInfoGraph(data){
+  var buildInfoGraph = this.buildInfoGraph = function(data){
 
     if (infoGraphicContainer.children){
       infoGraphicContainer.innerHTML = '';
@@ -285,7 +285,7 @@ var visualiser = (function() {
   }
 
   /* toggle infographic */
-  function toggleInfographic(){
+  var toggleInfographic = this.toggleInfographic = function(){
     if (!infographicVisible()) {
       infoGraphicContainer.classList.remove('infographic-container--hidden');
       pageTitle.textContent = sourceDropDown.value;
@@ -297,7 +297,7 @@ var visualiser = (function() {
     }
   }
 
-  function infographicVisible() {
+  var infographicVisible = this.infographicVisible = function() {
     return !infoGraphicContainer.classList.contains('infographic-container--hidden');
   }
 
