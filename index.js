@@ -248,57 +248,103 @@ var visualiser = (function() {
     });
   }
 
+  /* Alternate infographic builder*/
+var buildInfoGraph = this.buildInfoGraph = function(data){
+  function loadChart(dataArray, publication) {
+  google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable(dataArray);
+        var options = {};
+
+        function setPub(publication, options) {
+          options.title = publication + ' Headlines Today';
+        };
+
+        setPub(publication, options);
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+      }
+    }
+
+//This is a hard-coded topicsCount object so I had something to work from
+// var topicsCount = {
+//   'Sport': 2.84,
+//   'Politics': 8.5,
+//   'Business': 2.17,
+//   'Violence': 3.08,
+//   'Environment': 1.1,
+//   'Tech': 1.7
+// };
+
+//This builds the data structure for the pie chart from the topicsCount object
+  function getChartData() {
+    var publication = 'BBC';
+    var chartData = [['Category', 'score']];
+    var keys = Object.keys(topicsCount);
+      keys.forEach(function(key) {
+        chartData.push([key, topicsCount[key]]);
+      });
+      console.log(topicsCount, keys, chartData);
+    return loadChart(chartData, publication);
+  }
+
+  getChartData(topicsCount);
+}
+  /*end alternate infographic builder*/
+
   /* Infographic builder */
-  var buildInfoGraph = this.buildInfoGraph = function(data){
-
-    if (infoGraphicContainer.children){
-      infoGraphicContainer.innerHTML = '';
-    }
-    /* BEM */
-    var blockClass = 'graph',
-        elementClass = blockClass + '__item',
-        modifierClass = [
-          '--color1',
-          '--color2',
-          '--color3',
-          '--color4',
-          '--color5',
-          '--color6',
-          '--color7',
-          '--color8',
-          '--color9',
-          '--color10',
-        ];
-
-    /* Create ul */
-    var ul = document.createElement('ul');
-        ul.classList.add(blockClass);
-
-    var colorIndex = 0;
-    /* for each data piece */
-    for (var prop in data) {
-
-      /* Create element */
-      var li = document.createElement('li');
-          li.textContent = prop;
-
-      /* convert 0-1 float val to percent */
-      var percent = (data[prop] * 100).toFixed(0) + '%';
-
-      li.style.width = percent;
-      li.setAttribute('percent', percent);
-
-      /* assign random color modifier */
-      var randomColor = modifierClass[colorIndex];
-      colorIndex++;
-
-      li.classList.add(elementClass);
-      li.classList.add(elementClass + randomColor);
-
-      /* add li to ul */
-      ul.appendChild(li);
-    }
-
+  // var buildInfoGraph = this.buildInfoGraph = function(data){
+  //
+  //   if (infoGraphicContainer.children){
+  //     infoGraphicContainer.innerHTML = '';
+  //   }
+  //   /* BEM */
+  //   var blockClass = 'graph',
+  //       elementClass = blockClass + '__item',
+  //       modifierClass = [
+  //         '--color1',
+  //         '--color2',
+  //         '--color3',
+  //         '--color4',
+  //         '--color5',
+  //         '--color6',
+  //         '--color7',
+  //         '--color8',
+  //         '--color9',
+  //         '--color10',
+  //       ];
+  //
+  //   /* Create ul */
+  //   var ul = document.createElement('ul');
+  //       ul.classList.add(blockClass);
+  //
+  //   var colorIndex = 0;
+  //   /* for each data piece */
+  //   for (var prop in data) {
+  //
+  //     /* Create element */
+  //     var li = document.createElement('li');
+  //         li.textContent = prop;
+  //
+  //     /* convert 0-1 float val to percent */
+  //     var percent = (data[prop] * 100).toFixed(0) + '%';
+  //
+  //     li.style.width = percent;
+  //     li.setAttribute('percent', percent);
+  //
+  //     /* assign random color modifier */
+  //     var randomColor = modifierClass[colorIndex];
+  //     colorIndex++;
+  //
+  //     li.classList.add(elementClass);
+  //     li.classList.add(elementClass + randomColor);
+  //
+  //     /* add li to ul */
+  //     ul.appendChild(li);
+  //   }
+  //
     /* add to infoGraphicContainer */
     infoGraphicContainer.appendChild(ul);
   }
