@@ -12,6 +12,9 @@ var visualiser = (function() {
   // Global database
   var database = {};
 
+  // Media query
+  var isMobileScreen = window.matchMedia('(max-width: 600px)');
+
   // Waterfall function
   function waterfall(arg, tasks, cb) {
     var next = tasks[0];
@@ -89,8 +92,10 @@ var visualiser = (function() {
     var headlines = document.querySelectorAll('.headline');
     for(var i = 0; i < headlines.length; i++) {
       headlines[i].addEventListener('click', function() {
-        var description = this.querySelector('p');
-        description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+        if(isMobileScreen.matches) {
+          var description = this.querySelector('p');
+          description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+        }
       });
     }
   }
