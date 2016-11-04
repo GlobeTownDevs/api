@@ -7,17 +7,47 @@
   <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.0.1.css">
 </head>
 <body>
+
+<!-- hide everything on test -->
+<div style="display: none;">
+  <header id="banner" class="full-width position__fixed position__top">
+    <h1 class="align__center" id="page-title">Visualiser News</h1>
+  </header>
+  <div class="main-container">
+    <section class="source-selection container align__center">
+      <p class="source-selection__label">Select your source</p>
+      <select class="source-selection__dropdown" name="selectedSource" id="source-dropdown">
+      </select>
+      <img class="source-selection__logo align__center" id="source-logo" src="http://i.newsapi.org/bbc-news-s.png" alt="selected source logo" />
+    </section>
+
+    <section id="infographic" class="container">
+    </section>
+
+    <section id="headlines" class="container">
+    </section>
+  </div>
+
+  <div id="toggle-analysis" class="full-width position__fixed position__bottom">
+    <button type="button" id="analyze" name="toggle-analyse" class="btn align__center" disabled>Analyse</button>
+  </div>
+</div>
+
+
+
   <!-- include elements below for QUnit testing -->
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
 <!-- comment out mock XHR when testing real API requests -->
-  <!--<script type="text/javascript" src="tests/mockXHR.js"></script>-->
-  <script src="https://code.jquery.com/qunit/qunit-2.0.1.js"></script>
-  <script type="text/javascript" src="api-keys.js"></script>
-  <script type="text/javascript" src="index.js"></script>
-  <!--<script type="text/javascript" src="tests/mockXHR.js"></script>-->
+  <!--Mock XHR & analysis-->
+  <script type="text/javascript" src="tests/mockXHR.js"></script>
   <script type="text/javascript" src="tests/mockXHR_headlines.js"></script>
   <script type="text/javascript" src="tests/mockAnalysis.js"></script>
+  <!--standard apikeys + app-->
+  <script type="text/javascript" src="api-keys.js"></script>
+  <script type="text/javascript" src="index.js"></script>
+  <!--qunit and tests-->
+  <script src="https://code.jquery.com/qunit/qunit-2.0.1.js"></script>
   <script type="text/javascript" src="tests/tests-apis.js"></script>
   <!-- end of tests -->
 </body>
