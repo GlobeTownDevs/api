@@ -52,7 +52,7 @@ var visualiser = (function() {
 
   // Dropdown
   sourceDropDown.addEventListener('change', function(){
-    waterfall(sourceDropDown.value, [updateLogo, getHeadlines, updateArticles], function(err, res) {
+    waterfall(sourceDropDown.value, [analyzeButtonLoading, updateLogo, getHeadlines, updateArticles, analyzeButtonReady], function(err, res) {
       if(err) { throw new Error(err); }
       addToggleToHeadlines();
       analyzeBtn.disabled = false;
@@ -64,7 +64,7 @@ var visualiser = (function() {
     if(infographicVisible()) {
       toggleInfographic();
     } else {
-      waterfall(sourceDropDown.value, [getHeadlines, processHeadlines, normalise], function(err, res) {
+      waterfall(sourceDropDown.value, [analyzeButtonLoading, getHeadlines, processHeadlines, normalise, analyzeButtonReady], function(err, res) {
         if(err) { throw new Error(err); }
         buildInfoGraph(res);
         toggleInfographic();
@@ -73,6 +73,19 @@ var visualiser = (function() {
   });
 
   //// Waterfall end functions ////
+
+  // Analyze load/ready state functions
+  function analyzeButtonLoading(arg, cb){
+    analyzeBtn.textContent="loading";
+    analyzeBtn.disabled = true;
+    cb(null, arg);
+  }
+
+  function analyzeButtonReady(arg, cb){
+    analyzeBtn.textContent="Analyze";
+    analyzeBtn.disabled = false;
+    cb(null, arg);
+  }
 
   // function to build options for sourceDropDown select elements
   function buildOptions(database){

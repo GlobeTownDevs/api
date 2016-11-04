@@ -29,11 +29,10 @@ button, select {
 }
 
 /* Disabled */
-.btn:disabled {
-  color: grey;
-}
-.btn:disabled:hover {
-  background-color: #fff;
+.btn:disabled, .btn:disabled:hover {
+  background-color: rgba(255,255,255,0.5);
+  color: white;
+  cursor: default;
 }
 
 h1 {
