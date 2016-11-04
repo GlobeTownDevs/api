@@ -163,6 +163,7 @@ var visualiser = (function() {
   var updateLogo = this.updateLogo = function (selectedSource, cb){
     var logoUrl = database[selectedSource]['logo'];
     sourceLogo.src = logoUrl;
+    sourceLogo.alt = database[selectedSource]["name"] + ' logo';
     cb(null, selectedSource);
   }
 
@@ -174,7 +175,15 @@ var visualiser = (function() {
           article.classList.add('headline');
       var image = document.createElement('img');
           image.classList.add('headline__image');
-          image.src = headline.urlToImage;
+          // Default to source logo when headline logo is not available
+          if(headline["urlToImage"]) {
+            image.src = headline["urlToImage"];
+            image.alt = headline['title'] + ' - article image';
+          }
+          else {
+            image.src = selectedSource["logo"];
+            image.alt = selectedSource["name"] + ' logo';
+          }
       var heading = document.createElement('h1');
           heading.classList.add('headline__title');
           heading.textContent = headline.title;
