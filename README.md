@@ -1,3 +1,13 @@
+# Getting it running
+
+So one of our APIs doesn't work well with CORS and so for it to actually work you need to run Chrome with security disabled (obvioulsy a bad idea but our project is awesome). You need to run the following command. Let us know if you have problems.
+
+For OS X close Chrome and open in Terminal:
+`open -a Google\ Chrome --args --disable-web-security --user-data-dir`
+
+On Linux it should be something like:
+`google-chrome --disable-web-security --user-data-dir`
+
 # News Analysis API
 The aim of our api is to take the top ten news headlines from [News API](https://newsapi.org) and pass these to [Text Razor](https://www.textrazor.com), which will return a category analysis of each headline. Using the data returned from News Razor, we'll create an inforgraphic (probably a pie chart) that shows the emphasis of the news by category.
 
