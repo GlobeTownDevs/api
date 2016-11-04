@@ -132,9 +132,13 @@ h1 {
   padding-top: 0;
 }
 
-.headline__description {
+.headline__details {
   display: none;
   margin: 0.5em 0;
+}
+
+.headline__details__link {
+  text-decoration: none;
 }
 
 @media (min-width: 600px) {
@@ -142,8 +146,8 @@ h1 {
     max-width: 50%;
   }
 
-  .headline__description {
-    display: inherit;
+  .headline__details {
+    display: block;
   }
 }
 
