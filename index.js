@@ -91,10 +91,10 @@ var visualiser = (function() {
   function addToggleToHeadlines() {
     var headlines = document.querySelectorAll('.headline');
     for(var i = 0; i < headlines.length; i++) {
-      headlines[i].addEventListener('click', function() {
-        if(isMobileScreen.matches) {
-          var description = this.querySelector('p');
-          description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+      headlines[i].addEventListener('click', function(event) {
+        if(isMobileScreen.matches && event.target.tagName !== 'A') {
+          var details = this.querySelector('.headline__details');
+          details.style.display = details.style.display === 'block' ? 'none' : 'block';
         }
       });
     }
@@ -148,25 +148,32 @@ var visualiser = (function() {
   }
 
   function updateArticles(selectedSource, cb) {
-    headLines.innerHTML = '';
-    selectedSource['headlines'].forEach(function(headline) {
+    selectedSource.headlines.forEach(function(headline) {
       // creating new elements
       var article = document.createElement('article');
           article.classList.add('headline');
       var image = document.createElement('img');
           image.classList.add('headline__image');
-          image.src = headline['urlToImage'];
+          image.src = headline.urlToImage;
       var heading = document.createElement('h1');
           heading.classList.add('headline__title');
-          heading.textContent = headline['title'];
+          heading.textContent = headline.title;
+      var details = document.createElement('div');
+          details.classList.add('headline__details');
       var description = document.createElement('p');
-          description.classList.add('headline__description');
-          description.textContent = headline['description'];
+          description.classList.add('headline__details__description');
+          description.textContent = headline.description;
+      var link = document.createElement('a');
+          link.classList.add('headline__details__link');
+          link.href = headline.url;
+          link.textContent = 'See more...';
 
+      details.appendChild(description);
+      details.appendChild(link);
       // populating new elements
       article.appendChild(image);
       article.appendChild(heading);
-      article.appendChild(description);
+      article.appendChild(details);
       // Append to headlines
       headLines.appendChild(article);
     });
