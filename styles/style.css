@@ -71,7 +71,7 @@ h1 {
 }
 
 .source-selection {
-  height: 190px;
+  min-height: 160px;
   padding: 20px 0px;
   background-color: #CECC15;
   border-bottom: 1px solid #bab812;
