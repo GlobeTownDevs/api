@@ -139,6 +139,7 @@ var visualiser = (function() {
   function updateLogo(selectedSource, cb){
     var logoUrl = database[selectedSource]['logo'];
     sourceLogo.src = logoUrl;
+    sourceLogo.alt = database[selectedSource]["name"] + ' logo';
     cb(null, selectedSource);
   }
 
@@ -151,6 +152,7 @@ var visualiser = (function() {
       var image = document.createElement('img');
           image.classList.add('headline__image');
           image.src = headline['urlToImage'];
+          image.alt = headline['title'] + ' - article image';
       var heading = document.createElement('h1');
           heading.classList.add('headline__title');
           heading.textContent = headline['title'];
