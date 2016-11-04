@@ -103,17 +103,23 @@ var visualiser = (function() {
     var xhr = new XMLHttpRequest();
     xhr.addEventListener('load', function(){
       var json = JSON.parse(xhr.responseText);
-      json.sources.forEach(function(source){
-        database[source.name] = {
-          name: source.name,
-          id: source.id,
-          logo: source.urlsToLogos.small
-        };
+      json.sources.forEach(function(source) {
+        buildDatabase(source);
       });
       cb(null, database);
     });
     xhr.open('GET', url, true);
     xhr.send();
+  }
+
+  // Helper function for getSources
+
+  function buildDatabase(source) {
+    database[source.name] = {
+      name: source.name,
+      id: source.id,
+      logo: source.urlsToLogos.small
+    };
   }
 
   // 2. getHeadlines, accepts db object name and retrieves headlines
