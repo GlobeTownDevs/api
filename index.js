@@ -12,6 +12,9 @@ var visualiser = (function() {
   // Global database
   var database = {};
 
+  // Media query
+  var isMobileScreen = window.matchMedia('(max-width: 600px)');
+
   // Waterfall function
   var waterfall = this.waterfall = function (arg, tasks, cb) {
     var next = tasks[0];
@@ -101,9 +104,11 @@ var visualiser = (function() {
   var addToggleToHeadlines = this.addToggleToHeadlines = function() {
     var headlines = document.querySelectorAll('.headline');
     for(var i = 0; i < headlines.length; i++) {
-      headlines[i].addEventListener('click', function() {
-        var description = this.querySelector('p');
-        description.style.display = description.style.display === 'inherit' ? 'none' : 'inherit';
+      headlines[i].addEventListener('click', function(event) {
+        if(isMobileScreen.matches && event.target.tagName !== 'A') {
+          var details = this.querySelector('.headline__details');
+          details.style.display = details.style.display === 'block' ? 'none' : 'block';
+        }
       });
     }
   }
@@ -116,17 +121,23 @@ var visualiser = (function() {
     var xhr = new XMLHttpRequest();
     xhr.addEventListener('load', function(){
       var json = JSON.parse(xhr.responseText);
-      json.sources.forEach(function(source){
-        database[source.name] = {
-          name: source.name,
-          id: source.id,
-          logo: source.urlsToLogos.small
-        };
+      json.sources.forEach(function(source) {
+        buildDatabase(source);
       });
       cb(null, database);
     });
     xhr.open('GET', url, true);
     xhr.send();
+  }
+
+  // Helper function for getSources
+
+  function buildDatabase(source) {
+    database[source.name] = {
+      name: source.name,
+      id: source.id,
+      logo: source.urlsToLogos.small
+    };
   }
 
   // 2. getHeadlines, accepts db object name and retrieves headlines
@@ -163,18 +174,26 @@ var visualiser = (function() {
           article.classList.add('headline');
       var image = document.createElement('img');
           image.classList.add('headline__image');
-          image.src = headline['urlToImage'];
+          image.src = headline.urlToImage;
       var heading = document.createElement('h1');
           heading.classList.add('headline__title');
-          heading.textContent = headline['title'];
+          heading.textContent = headline.title;
+      var details = document.createElement('div');
+          details.classList.add('headline__details');
       var description = document.createElement('p');
-          description.classList.add('headline__description');
-          description.textContent = headline['description'];
+          description.classList.add('headline__details__description');
+          description.textContent = headline.description;
+      var link = document.createElement('a');
+          link.classList.add('headline__details__link');
+          link.href = headline.url;
+          link.textContent = 'See more...';
 
+      details.appendChild(description);
+      details.appendChild(link);
       // populating new elements
       article.appendChild(image);
       article.appendChild(heading);
-      article.appendChild(description);
+      article.appendChild(details);
       // Append to headlines
       headLines.appendChild(article);
     });
